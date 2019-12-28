@@ -55,16 +55,16 @@ void getTerminalSize() {
     struct winsize w;
     ioctl(0, TIOCGWINSZ, &w);
 
-    terminalX = w.ws_row;
-    terminalY = w.ws_col;
+    terminalX = w.ws_col;
+    terminalY = w.ws_row;
 #endif
 }
 
 void sleep() { // sleep for 0.05 seconds
 #ifdef _WIN32
-    Sleep(500);
+    Sleep(50);
 #else
-    nanosleep(50000000);
+    usleep(50000);
 #endif
 }
 
@@ -89,7 +89,7 @@ void initializeTerminal() {
 
     for (i = 0; i < terminalY; i++) {
         for (j = 0; j < terminalX; j++) {
-            print(' ');
+            terminal[i][j] = ' ';
         }
     }
 }
@@ -104,6 +104,10 @@ void printTerminal() {
             print(terminal[i][j]);
         }
     }
+
+#ifndef _WIN32
+    refresh();
+#endif
 }
 
 int main() {
@@ -113,6 +117,8 @@ int main() {
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
 #else
     signal(SIGINT, signalHandler);
+
+    initscr();
 #endif
     // getTerminalSize() has to be called twice because previousTerminalX and previousTerminalY have to be set
     getTerminalSize();
@@ -131,19 +137,23 @@ int main() {
         getTerminalSize();
 
         for (i = terminalY - 1; i >= 1; i--) {
-            for (j = 0; j < terminalX; j++) {
+            for (j = 0; j < terminalX; j += 2) {
                 terminal[i][j] = terminal[i - 1][j];
             }
         }
 
-        for (i = 0; i < terminalX; i++) {
-            terminal[0][i] = rand() % 95 + 32;
+        for (i = 0; i < terminalX; i += 2) {
+            terminal[0][i] = rand() % 94 + 33;
         }
 
         printTerminal();
 
         sleep();
     }
+
+#ifndef _WIN32
+    endwin();
+#endif
 
     return 0;
 }
