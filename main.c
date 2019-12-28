@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 unsigned int terminalX;
 unsigned int terminalY;
 unsigned int previousTerminalX;
 unsigned int previousTerminalY;
+
+static volatile bool isRunning = true;
 
 #ifdef _WIN32
     #include <windows.h>
@@ -11,6 +14,7 @@ unsigned int previousTerminalY;
     #include <ncurses.h>
     #include <sys/ioctl.h>
     #include <time.h>
+    #include <signal.h>
 #endif
 
 void mvprint(int x, int y, char ch) {
@@ -55,7 +59,26 @@ void sleep() { // sleep for 0.05 seconds
 #endif
 }
 
+#ifdef _WIN32
+    void WINAPI CtrlHandler(DWORD fdwCtrlType) {
+        if (fdwCtrlType == CTRL_C_EVENT) {
+            isRunning = false;
+        }
+    }
+#else
+    static void signalHandler(int t) {
+        (void) t;
+
+        isRunning = false;
+    }
+#endif
+
 int main() {
+#ifdef _WIN32
+    SetConsoleCtrlHandler(CtrlHandler, TRUE);
+#else
+    signal(SIGINT, signalHandler);
+#endif
     // getTerminalSize() has to be called twice because previousTerminalX and previousTerminalY have to be set
     getTerminalSize();
     getTerminalSize();
