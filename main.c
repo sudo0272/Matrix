@@ -94,8 +94,21 @@ void initializeTerminal() {
     }
 }
 
+void printTerminal() {
+    unsigned int i, j;
+
+    moveCursor(0, 0);
+
+    for (i = 0; i < terminalY; i++) {
+        for (j = 0; j < terminalX; j++) {
+            print(terminal[i][j]);
+        }
+    }
+}
+
 int main() {
-    unsigned int i;
+    unsigned int i, j;
+
 #ifdef _WIN32
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
 #else
@@ -104,6 +117,8 @@ int main() {
     // getTerminalSize() has to be called twice because previousTerminalX and previousTerminalY have to be set
     getTerminalSize();
     getTerminalSize();
+
+    srand(time(NULL));
 
     terminal = (char **) malloc(sizeof(char *) * terminalY);
     for (i = 0; i < terminalY; i++) {
@@ -115,7 +130,17 @@ int main() {
     while (isRunning) {
         getTerminalSize();
 
+        for (i = terminalY - 1; i >= 1; i--) {
+            for (j = 0; j < terminalX; j++) {
+                terminal[i][j] = terminal[i - 1][j];
+            }
+        }
 
+        for (i = 0; i < terminalX; i++) {
+            terminal[0][i] = rand() % 95 + 32;
+        }
+
+        printTerminal();
 
         sleep();
     }
