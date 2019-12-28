@@ -83,5 +83,9 @@ int main() {
     getTerminalSize();
     getTerminalSize();
 
+    while (isRunning) {
+        sleep();
+    }
+
     return 0;
 }
