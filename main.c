@@ -17,7 +17,7 @@ static volatile bool isRunning = true;
     #include <signal.h>
 #endif
 
-void mvprint(int x, int y, char ch) {
+void moveCursor(int x, int y) {
 #ifdef _WIN32
     COORD coord;
 
@@ -25,10 +25,16 @@ void mvprint(int x, int y, char ch) {
     coord.Y = y;
 
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+#else
+    move(y, x);
+#endif
+}
 
+void print(char ch) {
+#ifdef _WIN32
     printf("%c", ch);
 #else
-    mvaddch(y, x, (chtype) ch);
+    addch(ch);
 #endif
 }
 
