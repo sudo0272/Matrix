@@ -5,15 +5,16 @@ unsigned int terminalY;
 unsigned int previousTerminalX;
 unsigned int previousTerminalY;
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
     #include <windows.h>
 #else
     #include <ncurses.h>
     #include <sys/ioctl.h>
+    #include <time.h>
 #endif
 
 void mvprint(int x, int y, char ch) {
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
     COORD coord;
 
     coord.X = x;
@@ -30,7 +31,7 @@ void mvprint(int x, int y, char ch) {
 void getTerminalSize() {
     previousTerminalX = terminalX;
     previousTerminalY = terminalY;
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
@@ -43,6 +44,14 @@ void getTerminalSize() {
 
     terminalX = w.ws_row;
     terminalY = w.ws_col;
+#endif
+}
+
+void sleep() { // sleep for 0.05 seconds
+#ifdef _WIN32
+    Sleep(500);
+#else
+    nanosleep(50000000);
 #endif
 }
 
