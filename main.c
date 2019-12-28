@@ -11,6 +11,9 @@ static volatile bool isRunning = true;
 
 char **terminal;
 
+unsigned int *printCount;
+unsigned int *delayCount;
+
 #ifdef _WIN32
     #include <windows.h>
 #else
@@ -131,6 +134,14 @@ int main() {
         terminal[i] = (char *) malloc(sizeof(char) * terminalX);
     }
 
+    printCount = (unsigned int *) malloc(sizeof(unsigned int) * terminalX);
+    delayCount = (unsigned int *) malloc(sizeof(unsigned int) * terminalX);
+
+    for (i = 0; i < terminalX; i += 2) {
+        printCount[i] = rand() % 11;
+        delayCount[i] = 0;
+    }
+
     initializeTerminal();
 
     while (isRunning) {
@@ -143,7 +154,19 @@ int main() {
         }
 
         for (i = 0; i < terminalX; i += 2) {
-            terminal[0][i] = rand() % 94 + 33;
+            if (printCount[i] < 10) {
+                terminal[0][i] = rand() % 94 + 33;
+                printCount[i]++;
+            } else {
+                delayCount[i]++;
+
+                if (delayCount[i] == 6) {
+                    printCount[i] = rand() % 11;
+                    delayCount[i] = 0;
+                }
+
+                terminal[0][i] = ' ';
+            }
         }
 
         printTerminal();
