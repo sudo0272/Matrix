@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 unsigned int terminalX;
 unsigned int terminalY;
@@ -7,6 +8,8 @@ unsigned int previousTerminalX;
 unsigned int previousTerminalY;
 
 static volatile bool isRunning = true;
+
+char **terminal;
 
 #ifdef _WIN32
     #include <windows.h>
@@ -79,7 +82,20 @@ void sleep() { // sleep for 0.05 seconds
     }
 #endif
 
+void initializeTerminal() {
+    unsigned int i, j;
+
+    moveCursor(0, 0);
+
+    for (i = 0; i < terminalY; i++) {
+        for (j = 0; j < terminalX; j++) {
+            print(' ');
+        }
+    }
+}
+
 int main() {
+    unsigned int i;
 #ifdef _WIN32
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
 #else
@@ -89,7 +105,18 @@ int main() {
     getTerminalSize();
     getTerminalSize();
 
+    terminal = (char **) malloc(sizeof(char *) * terminalY);
+    for (i = 0; i < terminalY; i++) {
+        terminal[i] = (char *) malloc(sizeof(char) * terminalX);
+    }
+
+    initializeTerminal();
+
     while (isRunning) {
+        getTerminalSize();
+
+
+
         sleep();
     }
 
