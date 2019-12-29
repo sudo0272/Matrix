@@ -23,6 +23,10 @@ unsigned int *delayCount;
     #include <signal.h>
 #endif
 
+#ifndef _WIN32
+    #define COLOR 0
+#endif
+
 void moveCursor(int x, int y) {
 #ifdef _WIN32
     COORD coord;
@@ -126,6 +130,14 @@ int main() {
     // getTerminalSize() has to be called twice because previousTerminalX and previousTerminalY have to be set
     getTerminalSize();
     getTerminalSize();
+
+#ifdef _WIN32
+    system("color 02");
+#else
+    start_color();
+    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+    attron(COLOR_PAIR(COLOR_GREEN));
+#endif
 
     srand(time(NULL));
 
