@@ -121,6 +121,12 @@ int main() {
     unsigned int i, j;
 
 #ifdef _WIN32
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+    WORD consoleInfoBackup;
+#endif
+
+#ifdef _WIN32
     SetConsoleCtrlHandler(CtrlHandler, TRUE);
 #else
     signal(SIGINT, signalHandler);
@@ -132,7 +138,13 @@ int main() {
     getTerminalSize();
 
 #ifdef _WIN32
-    system("color 02");
+    // backup current console information
+    GetConsoleScreenBufferInfo(console, &consoleInfo);
+    consoleInfoBackup = consoleInfo.wAttributes;
+
+    // set console text
+    SetConsoleTextAttribute(console, FOREGROUND_GREEN);
+    SetConsoleTextAttribute(console, BACKGROUND_BLACK);
 #else
     start_color();
     init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
@@ -212,6 +224,11 @@ int main() {
 
 #ifndef _WIN32
     endwin();
+#endif
+
+#ifdef _WIN32
+    // restore attributes
+    SetConsoleTextAttribute(console, savedAttributes);
 #endif
 
     for (i = 0; i < terminalY; i++) {
