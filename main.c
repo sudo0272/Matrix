@@ -159,6 +159,30 @@ int main() {
     while (isRunning) {
         getTerminalSize();
 
+        if (terminalX != previousTerminalX ||
+            terminalY != previousTerminalY) {
+            
+            for (i = 0; i < previousTerminalY; i++) {
+                free(terminal[i]);
+            }
+            free(terminal);
+
+            printCount = (unsigned int *) realloc(printCount, sizeof(unsigned int) * terminalX);
+            delayCount = (unsigned int *) realloc(delayCount, sizeof(unsigned int) * terminalX);
+
+            for (i = 0; i < terminalX; i += 2) {
+                printCount[i] = rand() % 11;
+                delayCount[i] = 0;
+            }
+
+            terminal = (char **) malloc(sizeof(char *) * terminalY);
+            for (i = 0; i < terminalY; i++) {
+                terminal[i] = malloc(sizeof(char) * terminalX);
+            }
+
+            initializeTerminal();
+        }
+
         for (i = terminalY - 1; i >= 1; i--) {
             for (j = 0; j < terminalX; j += 2) {
                 terminal[i][j] = terminal[i - 1][j];
@@ -191,10 +215,6 @@ int main() {
 #endif
 
     for (i = 0; i < terminalY; i++) {
-        for (j = 0; j < terminalX; j++) {
-            free(terminal[i][j]);
-        }
-
         free(terminal[i]);
     }
     free(terminal);
