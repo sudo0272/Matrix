@@ -190,5 +190,14 @@ int main() {
     endwin();
 #endif
 
+    for (i = 0; i < terminalY; i++) {
+        for (j = 0; j < terminalX; j++) {
+            free(terminal[i][j]);
+        }
+
+        free(terminal[i]);
+    }
+    free(terminal);
+
     return 0;
 }
